@@ -7,10 +7,10 @@ process = cms.Process("HIOnia")
 options = VarParsing.VarParsing ('analysis')
 
 # setup any defaults you want
-options.outputFile = "Upsilon3SWithFSR_tuneD6T_5TeV02.root"
+options.outputFile = "Upsilon3S_tuneD6T_5TeV02.root"
 options.secondaryOutputFile = "Ups3S_DataSet.root"
 #options.inputFiles = 'file:Upsilon3SWithFSR_pa_1st_run_SKIM_STARTHI53_V27-v1.root'
-options.inputFiles = 'root://cms-xrd-global.cern.ch//store/group/phys_heavyions/stuli/MCpPb5TeV02/PYTHIA6_Upsilon3S_tuneD6T_5TeV02/Ups3SWithFSR_tuneD6T_5TeV02/170327_223902/0000/Upsilon3SWithFSR_pa_1st_run_SKIM_STARTHI53_V27-v1_105.root'
+options.inputFiles = 'root://cms-xrd-global.cern.ch//store/group/phys_heavyions/stuli/MCpPb5TeV02/PYTHIA6_Upsilon3S_tuneD6T_5TeV02/Ups3S_tuneD6T_5TeV02/170815_222027/0000/Upsilon3S_pa_1st_run_SKIM_STARTHI53_V27-v1_102.root'
 options.maxEvents = -1 # -1 means all events
 
 # get and parse the command line arguments
@@ -136,7 +136,7 @@ process.hionia = cms.EDAnalyzer('HiOniaAnalyzer',
                                 muonLessPV = cms.bool(True),
 
                                 #-- Gen Details
-                                oniaPDG = cms.int32(200553), #2S = 100553, 3S = 200553
+                                oniaPDG = cms.int32(200553), #1S = 553, 2S = 100553, 3S = 200553
                                 isHI = cms.untracked.bool(False),
                                 isPA = cms.untracked.bool(True),
                                 isMC = cms.untracked.bool(True),
