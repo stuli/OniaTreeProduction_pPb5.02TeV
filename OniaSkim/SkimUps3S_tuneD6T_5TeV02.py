@@ -12,9 +12,9 @@ options = VarParsing.VarParsing ('analysis')
 
 # setup any defaults you want
 #options.outputFile = 'JPsiWithFSR_pa_1st_run_SKIM_STARTHI53_V27-v1.root' # 2015 : 2M
-options.outputFile = 'Upsilon3S_pa_1st_run_SKIM_STARTHI53_V27-v1.root' # 2015 : 2M
+options.outputFile = 'Upsilon3S_pa_1st_run_MC_SKIM_STARTHI53_V27-v1.root' # 2015 : 2M
 #options.inputFile = 'root://cms-xrd-global.cern.ch//store/himc/HiWinter13/PYTHIA6_Upsilon1SWithFSR_tuneD6T_5TeV02/GEN-SIM-RECO/pa_STARTHI53_V27-v1/00000/0074FA10-CB57-E311-9C9C-00A0D1EE8F64.root'
-options.inputFiles = 'root://cms-xrd-global.cern.ch//store/himc/HiWinter13/PYTHIA6_Upsilon3S_tuneD6T_5TeV02/GEN-SIM-RECO/pa_STARTHI53_V27-v1/00000/0090ACE7-AD57-E311-A69E-7845C4F92ECD.root'
+options.inputFiles = 'root://cms-xrd-global.cern.ch//store/himc/HiWinter13/PYTHIA6_Upsilon3S_tuneD6T_5TeV02/GEN-SIM-RECO/pa_STARTHI53_V27-v1/00000/10AE4AE8-F457-E311-AA3A-00A0D1EE8C64.root'
 
 
 options.maxEvents = -1 # -1 means all events

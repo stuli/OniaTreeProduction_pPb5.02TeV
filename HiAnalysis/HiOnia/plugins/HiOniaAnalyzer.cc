@@ -578,6 +578,9 @@ HiOniaAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //   using namespace edm;
   InitEvent();
 
+  //Santona
+  std::cout << "Event Number " << nEvents << std::endl;
+
   nEvents++;
   hStats->Fill(BIN_nEvents);
    
@@ -1454,6 +1457,9 @@ HiOniaAnalyzer::fillGenInfo()
     for(std::vector<reco::GenParticle>::const_iterator it=collGenParticles->begin();
         it!=collGenParticles->end();++it) {
       const reco::GenParticle* gen = &(*it);
+
+      //Santona
+      std::cout << "Gen Particle ID " << gen->pdgId() << std::endl;
 
       if (abs(gen->pdgId()) == _oniaPDG  && gen->status() == 2 &&
           gen->numberOfDaughters() == 2) {
