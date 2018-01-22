@@ -1,0 +1,181 @@
+import FWCore.ParameterSet.Config as cms
+import FWCore.ParameterSet.VarParsing as VarParsing
+
+process = cms.Process("HIOnia")
+
+# setup 'analysis'  options
+options = VarParsing.VarParsing ('analysis')
+
+# setup any defaults you want
+options.outputFile = "Upsilon1S_pPb_5TeV02.root"
+options.secondaryOutputFile = "Ups1S_pPb_DataSet.root"
+#options.inputFiles = 'file:Upsilon1S_pa_pPb_SKIM_STARTHI53_V27-v1.root'
+options.inputFiles = 'root://cms-xrd-global.cern.ch//store/group/phys_heavyions/stuli/MCpPb5TeV02/Upsilon1S_pPb_5p02-Pythia8/Upsilon1S_pPb_5TeV02/180119_004941/0000/Upsilon1S_pa_pPb_SKIM_STARTHI53_V27-v1_1.root'
+options.maxEvents = -1 # -1 means all events
+
+# get and parse the command line arguments
+options.parseArguments()
+
+process.load("FWCore.MessageService.MessageLogger_cfi")
+process.MessageLogger.destinations = ['cout', 'cerr']
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
+
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
+#process.GlobalTag.globaltag = 'GR_E_V33::All' # express reco
+#process.GlobalTag.globaltag = 'GR_P_V43D::All' # prompt reco
+process.GlobalTag.globaltag = 'STARTHI53_V27::All'
+
+from HeavyIonsAnalysis.Configuration.CommonFunctions_cff import *
+overrideCentrality(process)
+
+process.HeavyIonGlobalParameters = cms.PSet(
+    centralityVariable = cms.string("HFtowersPlusTrunc"),
+    nonDefaultGlauberModel = cms.string(""), #Santona: recommended to use Hijing on twiki
+    centralitySrc = cms.InputTag("pACentrality"),
+    pPbRunFlip = cms.untracked.uint32(99999999) #Santona: was 211313, should be for data
+    )
+
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxEvents) )
+
+process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
+
+process.options = cms.untracked.PSet(SkipEvent = cms.untracked.vstring('ProductNotFound'))
+
+process.source = cms.Source("PoolSource",
+    fileNames = cms.untracked.vstring(
+        options.inputFiles
+    )
+)
+
+process.hltDblMuOpen = cms.EDFilter("HLTHighLevel",
+                 TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+                 HLTPaths = cms.vstring("HLT_PAL1DoubleMuOpen_v*"),
+                 eventSetupPathsKey = cms.string(''),
+                 andOr = cms.bool(True),
+                 throw = cms.bool(False)
+)
+
+process.hltDblMu0 = cms.EDFilter("HLTHighLevel",
+                 TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+                 HLTPaths = cms.vstring("HLT_PAL1DoubleMu0_HighQ_v*"),
+                 eventSetupPathsKey = cms.string(''),
+                 andOr = cms.bool(True),
+                 throw = cms.bool(False)
+)
+
+process.hltDblMu3 = cms.EDFilter("HLTHighLevel",
+                 TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+                 HLTPaths = cms.vstring("HLT_PAL2DoubleMu3_v*"),
+                 eventSetupPathsKey = cms.string(''),
+                 andOr = cms.bool(True),
+                 throw = cms.bool(False)
+)
+
+process.hltMu3 = cms.EDFilter("HLTHighLevel",
+                 TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+                 HLTPaths = cms.vstring("HLT_PAMu3_v*"),
+                 eventSetupPathsKey = cms.string(''),
+                 andOr = cms.bool(True),
+                 throw = cms.bool(False)
+)
+
+process.hltMu7 = cms.EDFilter("HLTHighLevel",
+                 TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+                 HLTPaths = cms.vstring("HLT_PAMu7_v*"),
+                 eventSetupPathsKey = cms.string(''),
+                 andOr = cms.bool(True),
+                 throw = cms.bool(False)
+)
+
+process.hltMu12 = cms.EDFilter("HLTHighLevel",
+                 TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+                 HLTPaths = cms.vstring("HLT_PAMu12_v*"),
+                 eventSetupPathsKey = cms.string(''),
+                 andOr = cms.bool(True),
+                 throw = cms.bool(False)
+)
+
+process.hltMult100DblMu3 = cms.EDFilter("HLTHighLevel",
+                 TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
+                 HLTPaths = cms.vstring("HLT_PAPixelTrackMultiplicity100_L2DoubleMu3_v*"),
+                 eventSetupPathsKey = cms.string(''),
+                 andOr = cms.bool(True),
+                 throw = cms.bool(False)
+)
+
+process.hionia = cms.EDAnalyzer('HiOniaAnalyzer',
+                                srcMuon = cms.InputTag("patMuonsWithTrigger"),
+                                srcMuonNoTrig = cms.InputTag("patMuonsWithoutTrigger"),
+                                src = cms.InputTag("onia2MuMuPatTrkTrk"),
+                                srcTracks = cms.InputTag("generalTracks"),
+                                genParticles = cms.InputTag("genParticles"),
+                                primaryVertexTag = cms.InputTag("offlinePrimaryVertices"),
+                                triggerResultsLabel = cms.InputTag("TriggerResults","","HLT"),
+                                srcCentrality = cms.InputTag("pACentrality"),
+                                
+                                #-- Reco Details
+                                useBeamSpot = cms.bool(False),
+                                useRapidity = cms.bool(True),
+                                
+                                #--
+                                maxAbsZ = cms.double(24.0),
+                                
+                                pTBinRanges = cms.vdouble(0.0, 6.0, 8.0, 9.0, 10.0, 12.0, 15.0, 40.0),
+                                etaBinRanges = cms.vdouble(0.0, 2.5),
+                                centralityRanges = cms.vdouble(20,40,100),
+
+                                onlyTheBest = cms.bool(False),		
+                                applyCuts = cms.bool(True),
+                                storeEfficiency = cms.bool(False),
+                      
+                                removeSignalEvents = cms.untracked.bool(False),
+                                removeTrueMuons = cms.untracked.bool(False),
+                                storeSameSign = cms.untracked.bool(True),
+                                
+                                muonLessPV = cms.bool(True),
+
+                                #-- Gen Details
+                                oniaPDG = cms.int32(553), #2S = 100553, 3S = 200553
+                                isHI = cms.untracked.bool(False),
+                                isPA = cms.untracked.bool(True),
+                                isMC = cms.untracked.bool(True),
+                                isPromptMC = cms.untracked.bool(True),
+
+                                #-- Histogram configuration
+                                combineCategories = cms.bool(False),
+                                fillRooDataSet = cms.bool(False),
+                                fillTree = cms.bool(True),
+                                fillHistos = cms.bool(False),
+				#Santona: Including do gen matching
+				#doGenMatching = cms.untracked.bool(True),
+                                #minimumFlag = cms.bool(True),
+                                minimumFlag = cms.bool(False),
+                                fillSingleMuons = cms.bool(True),
+				# Santona: Different... False elsewhere
+                                fillRecoTracks = cms.bool(True),
+                                histFileName = cms.string(options.outputFile),		
+                                dataSetName = cms.string(options.secondaryOutputFile),
+                                
+                                #--
+                                # NumberOfTriggers = cms.uint32(8),
+                                dblTriggerPathNames = cms.vstring("HLT_PAL1DoubleMuOpen_v1",
+                                                                  "HLT_PAL1DoubleMu0_HighQ_v1",
+                                                                  "HLT_PAL2DoubleMu3_v1",
+                                                                  "HLT_PAPixelTrackMultiplicity100_L2DoubleMu3_v1"),
+                                dblTriggerFilterNames = cms.vstring("hltL1fL1sPAL1DoubleMuOpenL1Filtered0",
+                                                                    "hltL1fL1sPAL1DoubleMu0HighQL1FilteredHighQ",
+                                                                    "hltL2fL1sPAL2DoubleMu3L2Filtered3",
+                                                                    "hltL2fL1sPAL2DoubleMu3L2Filtered3"),
+                                sglTriggerPathNames = cms.vstring("HLT_PAMu3_v1",
+                                                                  "HLT_PAMu7_v1",
+                                                                  "HLT_PAMu12_v1"),
+                                sglTriggerFilterNames = cms.vstring("hltL3fL2sMu3L3Filtered3",
+                                                                    "hltL3fL2sMu7L3Filtered7",
+                                                                    "hltL3fL2sMu12L3Filtered12")
+
+
+                                )
+
+
+#process.p = cms.Path(process.hltDblMuOpen*process.hionia)
+process.p = cms.Path(process.hionia)
